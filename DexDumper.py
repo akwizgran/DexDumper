@@ -28,6 +28,11 @@ def unzip(apk_file):
         try:
             zip_file = zipfile.ZipFile(apk_file, 'r')
             zip_file.extract('classes.dex')
+            for i in range (2, 100):
+                try:
+                    zip_file.extract('classes%d.dex' % i)
+                except Exception,e:
+                    continue
             return True
         except Exception,e:
             print 'Bad apk file..'
@@ -87,7 +92,7 @@ def dumper(dex_file, output_file):
     
     
 def main():
-    usage = 'usage: %prog -i INTPUT_FILE {-o OUTPUT_FILE}'
+    usage = 'usage: DexDumper -i INPUT_FILE {-o OUTPUT_FILE}'
     parser = OptionParser(usage)
     parser.add_option('-i', '--input', dest='input_file',
                       default=None,
@@ -100,6 +105,9 @@ def main():
     
     if options.input_file:
         input_file = options.input_file
+    else:
+        print usage
+        sys.exit(1)
         
     if options.output_file == 'output.txt':
         output_file = 'output.txt'
@@ -112,6 +120,9 @@ def main():
     
     if unzip(input_file):
         dumper('classes.dex', output_file)
+        for i in range(2, 100):
+            if os.path.exists('classes%d.dex' % i):
+                dumper('classes%d.dex' % i, '%s.%d' % (output_file, i))
     else:
         sys.exit(1)
             
